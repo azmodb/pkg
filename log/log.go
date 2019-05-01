@@ -24,6 +24,12 @@ type Logger interface {
 
 	// Fatalf writes a formated message to the log and aborts.
 	Fatalf(format string, args ...interface{})
+
+	// Panic is equivalent to Print() followed by a call to panic().
+	Panic(args ...interface{})
+
+	// Panicf is equivalent to Printf() followed by a call to panic().
+	Panicf(format string, args ...interface{})
 }
 
 // Level represents the level of logging.
@@ -111,6 +117,20 @@ func Fatal(args ...interface{}) {
 	fatalLog.Fatal(args...)
 }
 
+// Panicf log to the panic logs, regardless of the current log level.
+// Arguments are handled in the manner of fmt.Printf; a newline is
+// appended if missing.
+func Panicf(format string, args ...interface{}) {
+	fatalLog.Panicf(format, args...)
+}
+
+// Panic log to the panic logs, regardless of the current log level.
+// Arguments are handled in the manner of fmt.Print; a newline is
+// appended if missing.
+func Panic(args ...interface{}) {
+	fatalLog.Panic(args...)
+}
+
 var _ Logger = (*logger)(nil)
 
 func newStdLogger(prefix string) *log.Logger {
@@ -158,4 +178,12 @@ func (l *logger) Fatal(args ...interface{}) {
 
 func (l *logger) Fatalf(format string, args ...interface{}) {
 	l.log.Fatalf(format, args...)
+}
+
+func (l *logger) Panic(args ...interface{}) {
+	l.log.Panic(args...)
+}
+
+func (l *logger) Panicf(format string, args ...interface{}) {
+	l.log.Panicf(format, args...)
 }

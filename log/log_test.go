@@ -38,6 +38,14 @@ func (l *mockLogger) Fatalf(format string, args ...interface{}) {
 	l.fatal = true
 }
 
+func (l *mockLogger) Panic(args ...interface{}) {
+	l.fatal = true
+}
+
+func (l *mockLogger) Panicf(format string, args ...interface{}) {
+	l.fatal = true
+}
+
 func (l *mockLogger) verify(t *testing.T, i int) {
 	t.Helper()
 
