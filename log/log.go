@@ -101,14 +101,14 @@ func Error(args ...interface{}) {
 // Arguments are handled in the manner of fmt.Printf; a newline is
 // appended if missing.
 func Fatalf(format string, args ...interface{}) {
-	fatalLog.Printf(format, args...)
+	fatalLog.Fatalf(format, args...)
 }
 
 // Fatal log to the fatal logs, regardless of the current log level.
 // Arguments are handled in the manner of fmt.Print; a newline is
 // appended if missing.
 func Fatal(args ...interface{}) {
-	fatalLog.Print(args...)
+	fatalLog.Fatal(args...)
 }
 
 var _ Logger = (*logger)(nil)
