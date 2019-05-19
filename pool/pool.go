@@ -76,13 +76,12 @@ type Map map[interface{}]Pool
 //
 // The success result indicates whether a pool was found in the pool
 // map.
-func (m Map) Get(key interface{}) (value interface{}, success bool) {
+func (m Map) Get(key interface{}) (interface{}, bool) {
 	pool, success := m[key]
 	if !success {
-		return value, false
+		return nil, false
 	}
-	value = pool.Get()
-	return value, success
+	return pool.Get(), true
 }
 
 // Resetter resets all receiver state.
@@ -95,15 +94,15 @@ type Resetter interface {
 //
 // The success result indicates whether a pool was found in the pool
 // map.
-func (m Map) Put(key interface{}, value interface{}) bool {
+func (m Map) Put(key interface{}, v interface{}) bool {
 	pool, success := m[key]
 	if !success {
 		return false
 	}
-	if r, ok := value.(Resetter); ok {
+	if r, ok := v.(Resetter); ok {
 		r.Reset()
 	}
-	pool.Put(value)
+	pool.Put(v)
 	return true
 }
 
