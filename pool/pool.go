@@ -1,3 +1,5 @@
+// Package pool provides basic memory allocator primitives such as free
+// lists.
 package pool
 
 import "github.com/azmodb/pkg/log"
