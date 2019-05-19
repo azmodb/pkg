@@ -77,7 +77,7 @@ type Map map[interface{}]Pool
 func (m Map) Get(key interface{}) (value interface{}, success bool) {
 	pool, success := m[key]
 	if !success {
-		return
+		return value, false
 	}
 	value = pool.Get()
 	return value, success
