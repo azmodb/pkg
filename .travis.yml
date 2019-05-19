@@ -1,0 +1,8 @@
+go_import_path: github.com/azmodb/pkg
+language: go
+go:
+  - 1.12.x
+  - tip
+
+script:
+    - go test -v ./...
