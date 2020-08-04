@@ -1,6 +1,8 @@
 package wire
 
 import (
+	"bytes"
+	"io"
 	"math"
 	"reflect"
 	"testing"
@@ -110,4 +112,30 @@ func TestParseError(t *testing.T) {
 
 	_, n = ConsumeUint8(nil)
 	check(t, "ConsumeUint8", n, errUnexpectedEOF)
+}
+
+func TestWriteTo(t *testing.T) {
+	str := "NOTE 3: Each bit has the value either ZERO or ONE. --- ECMA-035 spec"
+
+	var buf bytes.Buffer
+	b := NewBuffer(nil)
+	b.WriteString(str)
+
+	n, err := b.WriteTo(&buf)
+	if err != nil {
+		t.Fatalf("writeto: %v", err)
+	}
+	if int(n) != len(str) {
+		t.Fatalf("writeto: expected %d written bytes, got %d", len(str), n)
+	}
+	if buf.String() != str {
+		t.Fatalf("writeto: expected content %q, got %q", str, buf.String())
+	}
+	if b.Len() != 0 {
+		t.Fatalf("writeto: expected empty buffer, got %d", b.Len())
+	}
+
+	if _, err = b.WriteTo(&buf); err != io.EOF {
+		t.Fatalf("writeto: expected EOF error, got %v", err)
+	}
 }

@@ -158,8 +158,6 @@ type Option func(*Buffer)
 type Buffer struct {
 	data []byte
 	err  error
-
-	off int
 }
 
 // NewBuffer allocates a new Buffer initialized with data, where the contents
@@ -300,23 +298,43 @@ func (b *Buffer) Uint8() uint8 {
 	return v
 }
 
+// WriteString appends the contents of s to b, growing the buffer as needed. The
+// return value n is the length of p; err is always nil.
+func (b *Buffer) WriteString(s string) (int, error) {
+	if len(s) == 0 {
+		return 0, nil
+	}
+	b.data = append(b.data, s...)
+	return len(s), nil
+}
+
+// Write appends the contents of p to b, growing the buffer as needed. The
+// return value n is the length of p; err is always nil.
+func (b *Buffer) Write(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+	b.data = append(b.data, p...)
+	return len(p), nil
+}
+
 // WriteTo writes data to w until b is drained or an error occurs. The return
 // value n is the number of bytes written; it always fits into an int, but it is
 // int64 to match the io.WriterTo interface. Any error encountered during the
 // write is also returned.
 func (b *Buffer) WriteTo(w io.Writer) (int64, error) {
-	var n int
-	if size := b.Len(); size > 0 {
-		m, err := w.Write(b.data[b.off:])
-		b.off += m
-		n = m
-		if err != nil {
-			return int64(n), err
-		}
-		if m != size {
-			return int64(n), io.ErrShortWrite
-		}
+	if len(b.data) == 0 {
+		return 0, io.EOF
 	}
+
+	n, err := w.Write(b.data)
+	if err != nil {
+		return int64(n), err
+	}
+	if n != len(b.data) {
+		return int64(n), io.ErrShortWrite
+	}
+
 	b.Reset() // Buffer is now empty; reset.
 	return int64(n), nil
 }
