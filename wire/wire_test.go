@@ -190,3 +190,25 @@ func TestRead(t *testing.T) {
 		}
 	}
 }
+
+func TestCopy(t *testing.T) {
+	str := "RULE 7: Option arguments cannot be optional. --- Sys V Interface p 343."
+
+	var buf bytes.Buffer
+	b := NewBuffer(nil)
+	b.WriteString(str)
+
+	n, err := io.Copy(&buf, b)
+	if err != nil {
+		t.Fatalf("copy: %v", err)
+	}
+	if int(n) != len(str) {
+		t.Fatalf("copy: expected %d written bytes, got %d", len(str), n)
+	}
+	if b.Len() != 0 {
+		t.Fatalf("copy: expected empty buffer, got %d", b.Len())
+	}
+	if buf.String() != str {
+		t.Fatalf("copy: expected content %q, got %q", str, buf.String())
+	}
+}
