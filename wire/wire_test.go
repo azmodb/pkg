@@ -139,3 +139,54 @@ func TestWriteTo(t *testing.T) {
 		t.Fatalf("writeto: expected EOF error, got %v", err)
 	}
 }
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func TestRead(t *testing.T) {
+	b := NewBuffer(nil)
+	for i, testcase := range []struct {
+		data string
+
+		p   []byte
+		err error
+	}{
+		{"abcd", make([]byte, 4), nil},
+		{"abcd", make([]byte, 3), nil},
+		{"abcd", make([]byte, 2), nil},
+		{"abcd", make([]byte, 1), nil},
+		{"abcd", make([]byte, 0), nil},
+
+		{"abcd", make([]byte, 5), nil},
+		{"abcd", make([]byte, 6), nil},
+
+		{"", make([]byte, 6), io.EOF},
+	} {
+		b.Reset()
+		b.WriteString(testcase.data)
+
+		n, err := b.Read(testcase.p)
+		if err != testcase.err {
+			t.Errorf("read (%.4d): expected %v error, got %v", i, testcase.err, err)
+		}
+		want := min(len(testcase.data), len(testcase.p))
+		if n != want {
+			t.Errorf("read (%.4d): expected %d read bytes, got %d", i, want, n)
+		}
+		want = max(len(testcase.data)-len(testcase.p), 0)
+		if b.Len() != want {
+			t.Errorf("read (%.4d): expected buffer size %d, got %d", i, want, b.Len())
+		}
+	}
+}

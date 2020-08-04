@@ -338,3 +338,16 @@ func (b *Buffer) WriteTo(w io.Writer) (int64, error) {
 	b.Reset() // Buffer is now empty; reset.
 	return int64(n), nil
 }
+
+// Read reads the next len(p) bytes from b or until b is drained. The return
+// value n is the number of bytes read. If the buffer has no data to return, err
+// is io.EOF (unless len(p) is zero); otherwise it is nil.
+func (b *Buffer) Read(p []byte) (int, error) {
+	if len(b.data) == 0 {
+		return 0, io.EOF
+	}
+
+	n := copy(p, b.data)
+	b.data = b.data[n:]
+	return n, nil
+}
